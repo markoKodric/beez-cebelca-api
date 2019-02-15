@@ -1,11 +1,12 @@
 <?php namespace Mare06xa\Beez\Classes;
 
+use GuzzleHttp\Client;
+
 class API
 {
     protected $apiToken;
     protected $apiDomain;
     protected $debugMode;
-
 
     public function __construct()
     {
@@ -14,71 +15,53 @@ class API
         $this->debugMode = env("BIZ_DEBUG");
     }
 
-    protected function formatParameters($data)
+    public function post($resource = "", $method = "", $data = "", $format = null, $explore = false)
     {
-        if (is_string($data)) return $data;
+        $apiClient = new Client();
 
-        return $data->toString();
+        $apiResponse = $apiClient->post($this->apiDomain . '/API', [
+            'query' => [
+                '_r' => $resource,
+                '_m' => $method
+            ],
+            'auth' => [$this->apiToken, 'x'],
+            'headers' => [
+                "User-Agent"     => "PHP-strpc-client",
+                "Content-Type"   => "application/x-www-form-urlencoded",
+                "Connection"     => "close",
+            ],
+            'form_params' => $data,
+            'debug' => fopen("php://stderr", "w+"),
+            'allow_redirects' => [
+                'strict' => true,
+                'referer' => true
+            ],
+            'synchronous' => true
+        ]);
+
+        return [
+            'responseBody' => json_decode($apiResponse->getBody()->getContents(), true),
+            'statusCode'   => $apiResponse->getStatusCode()
+        ];
     }
 
-    public function call($resource = "", $method = "", $data = "", $format = null, $explore = false)
+    public function getPDF($invoiceID, $pdfTitle, $language)
     {
-        $resultData = "";
-        $postData   = $this->formatParameters($data);
-        $headerStr  = "POST /API?&_r={" . $resource . "}&_m={" . $method . "}&_f={" . $format . "}" . ($explore?"&_x=1":"")." HTTP/1.1\r\n";
+        $apiClient = new Client();
 
-        $postHeaders = [
-            "Host"           => $this->apiDomain,
-            "Content-Type"   => "application/x-www-form-urlencoded",
-            "User-Agent"     => "PHP-strpc-client",
-            "Content-Length" => strlen($postData),
-            "Authorization"  => "Basic " . base64_encode($this->apiToken . ':x'),
-            "Connection"     => "close\r\n"
-        ];
+        $apiResponse = $apiClient->request('GET', $this->apiDomain . '/API-pdf', [
+            'auth' => [$this->apiToken, 'x'],
+            'query' => [
+                'id' => $invoiceID,
+                'res' => 'invoice-sent',
+                'format' => 'PDF',
+                'doctitle' => $pdfTitle,
+                'lang' => $language
+            ],
+            'stream' => true,
+            'debug' => fopen("php://stderr", "w+")
+        ]);
 
-        foreach ($postHeaders as $postHeader => $headerValue) {
-            $headerStr .= $postHeader . ": " . $headerValue . "\r\n";
-        }
-
-        $socketConn = fsockopen(
-            "ssl://{$this->apiDomain}",
-            "443",
-            $errNo,
-            $errStr,
-            30);
-
-        try {
-            fputs($socketConn, $headerStr . $postData);
-
-            while (!feof($socketConn))
-                $resultData .= fgets ($socketConn, 128);
-
-            fclose ($socketConn);
-        } catch (\Exception $exception) {
-            return $exception->getTrace();
-        }
-
-        $resultData = trim(substr($resultData, strpos($resultData, "\r\n\r\n") + 4));
-        $resultData = str_replace("'", '"', $resultData);
-        $resultData = json_decode($resultData, true);
-
-        return new Result($resultData);
-    }
-
-    public function getBinaryPDF($invoiceID, $documentTitle, $language)
-    {
-        $headerStr = [
-            'http' => [
-                'method' => "GET",
-                'header' => "Authorization: Basic " . base64_encode($this->apiToken . ':x') . "\r\n"
-            ]
-        ];
-
-        $context = stream_context_create($headerStr);
-
-        return file_get_contents(
-            "https://{" . $this->apiDomain . "}/API-pdf?id=" . $invoiceID . "&res=invoice-sent&format=PDF&doctitle=" . $documentTitle . "&lang=" . $language,
-            false,
-            $context);
+        return $apiResponse->getBody()->getContents();
     }
 }

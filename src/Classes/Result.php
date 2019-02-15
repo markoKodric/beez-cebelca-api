@@ -13,6 +13,11 @@ class Result
         $this->resultData = $result[0];
     }
 
+    public function getID()
+    {
+        return $this->resultData[0]['id'];
+    }
+
     public function getData()
     {
         return $this->resultData;

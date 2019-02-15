@@ -15,8 +15,8 @@ class InvoiceHead
     protected $conversionRate;
 
 
-    public function __construct($dateSent = "", $dateToPay = "", $dateServed = "",
-                                $customerID = "", $taxNum = "", $currencyID = "", $externalDocumentID = "")
+    public function __construct($customerID = "", $dateSent = "", $dateToPay = "", $dateServed = "",
+                                $taxNum = "", $currencyID = "", $externalDocumentID = "")
     {
         $this->dateSent   = $dateSent;
         $this->dateToPay  = $dateToPay;
@@ -83,15 +83,28 @@ class InvoiceHead
         return $this;
     }
 
+    public function toArray()
+    {
+        return [
+            "date_sent"       => $this->dateSent,
+            "date_to_pay"     => $this->dateToPay,
+            "date_served"     => $this->dateServed,
+            "id_partner"      => $this->customerID,
+            "id_currency"     => $this->currencyID,
+            "conv_rate"       => $this->conversionRate,
+            "id_document_ext" => $this->externalDocumentID
+        ];
+    }
+
     public function toString()
     {
         return
-            "date_sent="   . $this->dateSent .
-            "date_to_pay=" . $this->dateToPay .
-            "date_served=" . $this->dateServed .
-            "id_partner="  . $this->customerID .
-            "id_currency=" . $this->currencyID .
-            "conv_rate="   . $this->conversionRate .
-            "id_document_ext=" . $this->externalDocumentID;
+            urlencode("date_sent")    . "=" . urlencode($this->dateSent) . "&" .
+            urlencode("date_to_pay")    . "=" . urlencode($this->dateToPay) . "&" .
+            urlencode("date_served")    . "=" . urlencode($this->dateServed) . "&" .
+            urlencode("id_partner")    . "=" . urlencode($this->customerID) . "&" .
+            urlencode("id_currency")    . "=" . urlencode($this->currencyID) . "&" .
+            urlencode("conv_rate")    . "=" . urlencode($this->conversionRate) . "&" .
+            urlencode("id_document_ext")    . "=" . urlencode($this->externalDocumentID);
     }
 }

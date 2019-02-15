@@ -55,13 +55,24 @@ class Customer
         return $this;
     }
 
+    public function toArray()
+    {
+        return [
+            'name' => $this->name,
+            'street' => $this->address,
+            'postal' => $this->postcode,
+            'city' => $this->city,
+            'country'
+        ];
+    }
+
     public function toString()
     {
         return
-            "name="    . $this->name .
-            "street="  . $this->address .
-            "postal="  . $this->postcode .
-            "city="    . $this->city .
-            "country=" . $this->country;
+            urlencode("name")    . "=" . urlencode($this->name) . "&" .
+            urlencode("street")  . "=" . urlencode($this->address) . "&" .
+            urlencode("postal")  . "=" . urlencode($this->postcode) . "&" .
+            urlencode("city")    . "=" . urlencode($this->city) . "&" .
+            urlencode("country") . "=" . urlencode($this->country);
     }
 }

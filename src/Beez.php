@@ -1,12 +1,6 @@
 <?php namespace Mare06xa\Beez;
 
 use Mare06xa\Beez\Classes\API;
-use Mare06xa\Beez\Classes\Customer;
-use Mare06xa\Beez\Classes\InvoiceHead;
-use Mare06xa\Beez\Classes\InvoiceItems;
-use Mare06xa\Beez\Classes\Location;
-use Mare06xa\Beez\Classes\Payments;
-use Mare06xa\Beez\Classes\FiscalizeData;
 
 class Beez
 {
@@ -20,19 +14,37 @@ class Beez
         $this->result = [];
     }
 
+    protected function invoiceID()
+    {
+        return $this->result['invoiceID'][0][0]['id'];
+    }
+
+    public function getResult($key = null)
+    {
+        if ($key) return $this->result[$key];
+
+        return $this->result;
+    }
+
     /**
      * Inserts the customer in DB and returns it's ID.
      * If customer already exists in DB it only returns it's ID.
      *
-     * @param Customer $customer
+     * @param array $data
      * @return $this
+     * @throws \Exception
      */
-    public function insertCustomer(Customer $customer)
+    public function insertCustomer($data = [])
     {
-        $this->result = $this->API->call(
+        $apiResponse = $this->API->post(
             'partner',
             'assure',
-            $customer);
+            $data);
+
+        if ($apiResponse['statusCode'] !== 200)
+            throw new \Exception($apiResponse['responseBody']);
+
+        $this->result['customerID'] = $apiResponse['responseBody'];
 
         return $this;
     }
@@ -40,23 +52,35 @@ class Beez
     /**
      * Insert head data into the invoice and returns it's ID.
      *
-     * @param InvoiceHead $invoiceHead
+     * @param array $data
      * @param bool $withMoreOptions
      * @return $this
+     * @throws \Exception
      */
-    public function insertHead(InvoiceHead $invoiceHead, $withMoreOptions = false)
+    public function insertHead($data = [], $withMoreOptions = false)
     {
+        if (!array_key_exists('customerID', $this->result)) {
+            throw new \Exception('Customer ID from previous api call (insertCustomer) is required.');
+        }
+
+        $data['id_partner'] = $this->result['customerID'][0][0]['id'];
+
         if ($withMoreOptions) {
-            $this->result = $this->API->call(
+            $apiResponse = $this->API->post(
                 'invoice-sent',
                 'insert-smart-2',
-                $invoiceHead);
+                $data);
         } else {
-            $this->result = $this->API->call(
+            $apiResponse = $this->API->post(
                 'invoice-sent',
                 'insert-into',
-                $invoiceHead);
+                $data);
         }
+
+        if ($apiResponse['statusCode'] !== 200)
+            throw new \Exception($apiResponse['responseBody']);
+
+        $this->result['invoiceID'] = $apiResponse['responseBody'];
 
         return $this;
     }
@@ -64,15 +88,29 @@ class Beez
     /**
      * Insert body data (products, services,...) into the invoice
      *
-     * @param InvoiceItems $invoiceItems
+     * @param array $data
      * @return $this
+     * @throws \Exception
      */
-    public function insertItems(InvoiceItems $invoiceItems)
+    public function insertItems($data = [])
     {
-        $this->result = $this->API->call(
-            'invoice-sent-b',
-            'insert-into',
-            $invoiceItems->toJSON());
+        if (!array_key_exists('invoiceID', $this->result)) {
+            throw new \Exception('Invoice ID from previous api call (insertHead) is required.');
+        }
+
+        for ($i = 0; $i < count($data); $i++) {
+            $data[$i]['id_invoice_sent'] = $this->invoiceID();
+
+            $apiResponse = $this->API->post(
+                'invoice-sent-b',
+                'insert-into',
+                $data[$i]);
+
+            if ($apiResponse['statusCode'] !== 200)
+                throw new \Exception($apiResponse['responseBody']);
+
+            $this->result['responseInsertItems'] = $apiResponse['responseBody'];
+        }
 
         return $this;
     }
@@ -80,96 +118,119 @@ class Beez
     /**
      * Insert payment data into the invoice
      *
-     * @param Payments $payments
+     * @param array $data
      * @param bool $withoutAmount
      * @return $this
+     * @throws \Exception
      */
-    public function insertPayment(Payments $payments, $withoutAmount = false)
+    public function insertPayment($data = [], $withoutAmount = false)
     {
+        if (!array_key_exists('invoiceID', $this->result)) {
+            throw new \Exception('Invoice ID from previous api call (insertHead or insertItems) is required.');
+        }
+
+        $data['id_invoice_sent'] = $this->invoiceID();
+
         if ($withoutAmount) {
-            $this->result = $this->API->call(
+            $apiResponse = $this->API->post(
                 'invoice-sent-p',
                 'mark-paid',
-                $payments->toJSON());
+                $data);
         } else {
-            $this->result = $this->API->call(
+            $apiResponse = $this->API->post(
                 'invoice-sent-p',
                 'insert-into',
-                $payments->toJSON());
+                $data);
         }
+
+        if ($apiResponse['statusCode'] !== 200)
+            throw new \Exception($apiResponse['responseBody']);
+
+        $this->result['responseInsertPayment'] = $apiResponse['responseBody'];
 
         return $this;
     }
 
     /**
-     * @param FiscalizeData $fiscalizeData
+     * @param array $data
      * @param bool $noLocation
      * @return $this
+     * @throws \Exception
      */
-    public function fiscalizeInvoice(FiscalizeData $fiscalizeData, $noLocation = false)
+    public function fiscalizeInvoice($data = [], $noLocation = false)
     {
-        if ($noLocation) {
-            $this->result = $this->API->call(
-                'invoice-sent',
-                'finalize-invoice-2015',
-                $fiscalizeData);
-        } else {
-            $this->result = $this->API->call(
-                'invoice-sent',
-                'finalize-invoice',
-                $fiscalizeData);
+        if (!array_key_exists('invoiceID', $this->result)) {
+            throw new \Exception('Invoice ID from previous api call (insertHead | insertItems | insertPayment) is required.');
         }
 
-        return $this;
-    }
+        $data['id'] = $this->invoiceID();
 
-    /**
-     * @param $invoiceID
-     * @return $this
-     */
-    public function getFiscalInfo($invoiceID)
-    {
-        $this->result = $this->API->call(
+        if ($noLocation) {
+            $apiResponse = $this->result['fiscalizeData'] = $this->API->post(
+                'invoice-sent',
+                'finalize-invoice-2015',
+                $data);
+        } else {
+            $apiResponse = $this->API->post(
+                'invoice-sent',
+                'finalize-invoice',
+                $data);
+        }
+
+        if ($apiResponse['statusCode'] !== 200)
+            throw new \Exception($apiResponse['responseBody']);
+
+        $this->result['fiscalizeData'] = $apiResponse['responseBody'];
+
+        $this->result['fiscalInfo'] = $this->API->post(
             'invoice-sent',
             'get-fiscal-info',
-            $invoiceID);
+            [
+                'id' => $data['id']
+            ]);
 
         return $this;
     }
 
     /**
-     * @param $invoiceID
      * @param $storagePath
-     * @param $documentTitle
+     * @param $pdfTitle
      * @param string $language
      * @return $this
      */
-    public function generatePDF($invoiceID, $storagePath, $documentTitle, $language = "si")
+    public function generatePDF($storagePath, $pdfTitle, $language = "si")
     {
-        $this->result = $this->API->getBinaryPDF($invoiceID, $documentTitle, $language);
+        $this->result['invoicePDF'] = $this->API->getPDF(
+            $this->invoiceID(),
+            $pdfTitle,
+            $language);
 
-        $pdfPath = $storagePath . "/" . $documentTitle . ".pdf";
-        file_put_contents($pdfPath, $this->result);
+        $pdfPath = $storagePath . $pdfTitle . '.pdf';
+
+        file_put_contents($pdfPath, $this->result['invoicePDF']);
 
         return $this;
     }
 
     /**
-     * @param Location $location
+     * @param array $data
      * @param bool $testMode
      * @return $this
      */
-    public function addLocationFURS(Location $location, $testMode = false)
+    public function addLocationFURS($data = [], $testMode = false)
     {
-        $this->result = $this->API->call(
+        $this->result['fursLocation'] = $this->API->post(
             'sales-location',
             'insert-into',
-            $location);
+            $data)['responseBody'];
 
-        $this->API->call(
+        $this->API->post(
             'sales-location',
             'register-at-furs',
-            "id=" . $this->result . "&test_mode=" . $testMode . "\r\n");
+            [
+                'id' =>  $this->result['fursLocation'][0][0]['id'],
+                'test_mode' => $testMode ? "1" : "0"
+            ]);
 
         return $this;
     }
