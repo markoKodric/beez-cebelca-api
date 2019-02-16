@@ -54,6 +54,9 @@ You can do this in Cebelca web interface too. This is the way to do it with API.
 | register_id  | Internal id of register (you determine it, must be unique) | String | Yes      |
 | test_mode    | Register with test or real FURS server                     | 0/1    | No       |
 
+
+---
+
 ***Insert the customer (partner)***
 
 - If the partner is already in the database it returns it's ID
