@@ -4,7 +4,9 @@ Beez allow you to create invoices and inventory sales.
 
 ## Installation
 Require this package with [composer](http://getcomposer.org).
-`composer require mare06xa/beez --dev`
+
+```composer require mare06xa/beez --dev```
+
 Laravel 5.5+ uses Package Auto-Discovery, so doesn't require you to manually add the ServiceProvider.
 
 ## Laravel 5.4:
@@ -14,13 +16,14 @@ If you don't use auto-discovery, add the ServiceProvider to the providers array 
 ## Usage
 
 ***Customer***
+
 | Key | Description | Required |
 |------|-----|-----|
-| name   | Company or person's name | - [x] |
-| street | Company or person's street address | - [x] |
-| postal | Company or person's postal code | - [x] |
-| city   | Company or person's city | - [x] |
-| country | Company or person's country | - [] |
+| name   | Company or person's name | Yes |
+| street | Company or person's street address | Yes |
+| postal | Company or person's postal code | Yes |
+| city   | Company or person's city | Yes |
+| country | Company or person's country | No |
 
 ```
 $beezAPI = new Beez();
