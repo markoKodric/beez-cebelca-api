@@ -49,7 +49,7 @@ You can do this in Cebelca web interface too. This is the way to do it with API.
 
 | Key          | Description                                                | Format | Required |
 |--------------|------------------------------------------------------------|----------------|----------|
-| type         | Location type<br><br>A => Movable object (car, taxi, ...)<br>B => Fixed address<br>C => Electronic device) | String | Yes |
+| type         | Location type<br>- A: Movable object (car, taxi, ...)<br>- B: Fixed address<br>- C: Electronic device | String | Yes |
 | location_id  | Internal id of location (you determine it, must be unique) | String | Yes      |
 | register_id  | Internal id of register (you determine it, must be unique) | String | Yes      |
 | test_mode    | Register with test or real FURS server                     | 0/1    | No       |
