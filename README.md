@@ -38,6 +38,22 @@ BIZ_DEBUG=false
 
 ## Usage
 
+***Registering location***
+
+Before you can fiscalize invoices you need to register location with Tax Office.  
+If you want to TEST fiscalize invoices you need to register location to TEST FURS server.
+
+You can do this in Cebelca web interface too. This is the way to do it with API. This way you get and ID of location automatically.
+
+**You don't need to use this if you already have the location.**
+
+| Key          | Description                                                | Format | Required |
+|--------------|------------------------------------------------------------|----------------|----------|
+| type         | Location type (A: Movable object (car, taxi, ...); B: Fixed address; C: Electronic device) | String | Yes |
+| location_id  | Internal id of location (you determine it, must be unique) | String | Yes      |
+| register_id  | Internal id of register (you determine it, must be unique) | String | Yes      |
+| test_mode    | Register with test or real FURS server                     | 0/1    | No       |
+
 ***Insert the customer (partner)***
 
 - If the partner is already in the database it returns it's ID
@@ -139,7 +155,21 @@ Parameters:
 
 ## Examples
 
-- Basic making of an invoice
+- Registering location
+```php
+$beezAPI = new Beez();
+
+$beezAPI->addLocation([
+    'type'        => 'C',
+    'location_id' => 'UniqueLocation1245',
+    'register_id' => 'UniqueRegister1254',
+    'test_mode'   => 1
+]);
+
+echo $beezApi->getLocation();
+```
+
+- Basic making of an invoice and generating PDF
 ```php
 $beezAPI = new Beez();
 
