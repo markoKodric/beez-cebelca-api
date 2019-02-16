@@ -14,7 +14,7 @@ Laravel 5.5+ uses **Package Auto-Discovery**, so doesn't require you to manually
 **Laravel 5.4 and below:**
 If you don't use auto-discovery, add the ServiceProvider to the providers array in `config/app.php`
 
-```
+```php
 Mare06xa\Beez\BeezServiceProvider::class
 ```
 
@@ -140,7 +140,7 @@ Parameters:
 ## Examples
 
 - Basic making of an invoice
-```
+```php
 $beezAPI = new Beez();
 
 $beezAPI->insertCustomer([
