@@ -80,10 +80,10 @@ First you add the Invoice head and get the ID of added invoice.
 
 | Key         | Description                             | Format / Options | Required |
 |-------------|-----------------------------------------|-------------------|----------|
-| date_sent   | Date when invoice was issued            | Date (dd.mm.yyyy) | Yes      |
-| date_served | Date when service or item was delivered | Date (dd.mm.yyyy) | Yes      |
-| date_to_pay | Date to which invoice should be payed   | Date (dd.mm.yyyy) | Yes      |
-| date_payed  | Date when invoice was paid              | Date (dd.mm.yyyy) | No       |
+| date_sent   | Date when invoice was issued            | Date (d.m.Y) | Yes      |
+| date_served | Date when service or item was delivered | Date (d.m.Y) | Yes      |
+| date_to_pay | Date to which invoice should be payed   | Date (d.m.Y) | Yes      |
+| date_payed  | Date when invoice was paid              | Date (d.m.Y) | No       |
 | payment     | Mark that invoice has been paid         | String ["paid"]   | No       |
 
 
@@ -121,7 +121,7 @@ Adds one/multiple items to the invoice.
 
 | Key               | Description                                              | Format            | Required |
 |-------------------|----------------------------------------------------------|-------------------|----------|
-| date_of           | Date of payment                                          | Date (dd.mm.yyyy) | Yes      |
+| date_of           | Date of payment                                          | Date (d.m.Y) | Yes      |
 | amount            | Total amount paid (calculated automatically if left out) | Float             | No       |
 | id_payment_method | Payment method ID (1: Credit card, 2: Cash)              | Integer           | Yes      |
 
