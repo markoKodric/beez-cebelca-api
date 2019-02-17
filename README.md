@@ -1,6 +1,6 @@
 # Beez
 
-Beez allow you to create invoices and inventory sales.
+Beez allows you to create invoices and inventory sales.
 
 ## Installation
 Require this package with [composer](http://getcomposer.org).
