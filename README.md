@@ -68,6 +68,7 @@ You can do this in Cebelca web interface too. This is the way to do it with API.
 | postal  | Company or person's postal code    | String/Integer | No       |
 | city    | Company or person's city           | String         | No       |
 | country | Company or person's country        | String         | No       |
+| vatid   | Company or person's VAT number     | String         | No       |
 
 ---
 
@@ -95,7 +96,7 @@ Use ***withMoreOptions*** parameter in function.
 
 | Key             | Description                                                      | Format         | Required |
 |-----------------|------------------------------------------------------------------|----------------|----------|
-| taxnum          | Can be used instead of **insertCustomer** function               | String/Integer | No       |
+| taxnum          | Company or person's VAT number                                   | String         | No       |
 | id_document_ext | Overrides the ID of invoice sent by Cebelca **(must be unique)** | String/Integer | No       |
 | id_currency     | Foreign currency ID (default currency is EUR)                    | String/Integer | No       |
 | conv_rate       | Conversion rate between foreign curreny and EUR                  | String/Float   | No       |
@@ -156,6 +157,8 @@ Parameters:
 
 ## Examples
 
+---
+
 - Registering location
 ```php
 $beezAPI = new Beez();
@@ -169,6 +172,13 @@ $beezAPI->addLocation([
 
 echo $beezApi->getLocation();
 ```
+
+---
+- Set currency
+```php
+$beezAPI->setCurrency(Currency::HRK);
+```
+---
 
 - Basic making of an invoice and generating PDF
 ```php
@@ -213,3 +223,5 @@ $beezAPI->insertCustomer([
     'op-name'     => 'Operator'
 ])->generatePDF('path/to/pdf/', 'PDF Title');
 ```
+
+---
