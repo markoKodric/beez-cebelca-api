@@ -215,7 +215,7 @@ $beezAPI->insertCustomer([
 ])->insertPayment([
     'date_of' => Carbon::now()->addDay()->format("d.m.Y"),
     'amount'  => 54.5,
-    'id_payment_method' => Payment::CREDIT_CARD,
+    'id_payment_method' => PaymentOptions::CREDIT_CARD,
 ])->fiscalizeInvoice([
     'id_location' => 12,
     'fiscalize'   => 1,
