@@ -209,7 +209,7 @@ $beezAPI->insertCustomer([
 ])->fiscalizeInvoice([
     'id_location' => 12,
     'fiscalize'   => 1,
-    'op-tax-id    => '123456789',
+    'op-tax-id'   => '123456789',
     'op-name'     => 'Operator'
 ])->generatePDF('path/to/pdf/', 'PDF Title');
 ```
