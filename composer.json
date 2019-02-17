@@ -1,7 +1,7 @@
 {
     "name": "mare06xa/beez",
     "description": "Package for creating invoices with Cebelca BIZ in Laravel.",
-    "license": "license",
+    "license": "MIT",
     "authors": [
         {
             "name": "Marko Kodric",
