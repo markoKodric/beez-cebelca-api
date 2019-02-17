@@ -3,7 +3,7 @@
 namespace Mare06xa\Beez\Classes;
 
 
-class Payment
+class PaymentOptions
 {
     /*
      * Payment methods

@@ -16,7 +16,7 @@ class InvoiceHeadValidation implements InvoiceValidation
         'taxnum'          => 'string|max:11',
         'id_document_ext' => 'integer',
         'id_currency'     => 'integer|between:0,80',
-        'conv_rate'       => 'numeric',
+        'conv_rate'       => 'required_with:id_currency|numeric',
     ];
 
     protected $messages = [

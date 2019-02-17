@@ -1,6 +1,7 @@
 <?php namespace Mare06xa\Beez;
 
 use Mare06xa\Beez\Classes\API;
+use Mare06xa\Beez\Classes\Currency;
 use Mare06xa\Beez\Validations\CustomerValidation;
 use Mare06xa\Beez\Validations\InvoiceHeadValidation;
 use Mare06xa\Beez\Validations\InvoiceItemValidation;
@@ -13,13 +14,16 @@ class Beez
     protected $API;
     protected $result;
     protected $testMode;
-
+    protected $currency;
+    protected $conversionRate;
 
     public function __construct()
     {
-        $this->API      = new API();
-        $this->result   = [];
-        $this->testMode = $this->API->testMode();
+        $this->API            = new API();
+        $this->result         = [];
+        $this->testMode       = $this->API->testMode();
+        $this->currency       = Currency::EUR;
+        $this->conversionRate = 1;
     }
 
     public function invoiceID()
@@ -48,6 +52,16 @@ class Beez
         return $this->result['customerID'][0][0]['id'];
     }
 
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
+
+    public function getConversionRate()
+    {
+        return $this->conversionRate;
+    }
+
     /**
      * @param string $key
      * @param mixed $value
@@ -66,6 +80,12 @@ class Beez
     protected function setData(&$data, $key, $value)
     {
         return $data[$key] = $value;
+    }
+
+    public function setCurrency($currencyID)
+    {
+        $this->currency = $currencyID;
+        $this->conversionRate = Currency::getConversionRate($currencyID);
     }
 
     /**
@@ -138,6 +158,11 @@ class Beez
             $this->setData($data, 'id_partner', $this->getCustomerID());
         else
             $this->setData($data, 'id_partner', 0);
+
+        if ($this->getCurrency() != Currency::EUR) {
+            $this->setData($data, 'id_currency', $this->getCurrency());
+            $this->setData($data, 'conv_rate',   $this->getConversionRate());
+        }
 
         if ($withMoreOptions)
             $apiResponse = $this->API->post('invoice-sent', 'insert-smart-2', $data);
