@@ -31,7 +31,7 @@ Add this lines to your `.env` configuration file
 ```
 BIZ_TOKEN={Insert your token here}
 BIZ_DOMAIN=https://www.cebelca.biz
-BIZ_DEBUG=false
+BIZ_TEST_MODE=false
 ```
 
 ---
@@ -52,7 +52,6 @@ You can do this in Cebelca web interface too. This is the way to do it with API.
 | type         | Location type<br>- A: Movable object (car, taxi, ...)<br>- B: Fixed address<br>- C: Electronic device | String | Yes |
 | location_id  | Internal id of location (you determine it, must be unique) | String | Yes      |
 | register_id  | Internal id of register (you determine it, must be unique) | String | Yes      |
-| test_mode    | Register with test or real FURS server                     | 0/1    | No       |
 
 
 ---
@@ -65,9 +64,9 @@ You can do this in Cebelca web interface too. This is the way to do it with API.
 | Key     | Description                        | Format         | Required |
 |---------|------------------------------------|----------------|----------|
 | name    | Company or person's name           | String         | Yes      |
-| street  | Company or person's street address | String         | Yes      |
-| postal  | Company or person's postal code    | String/Integer | Yes      |
-| city    | Company or person's city           | String         | Yes      |
+| street  | Company or person's street address | String         | No       |
+| postal  | Company or person's postal code    | String/Integer | No       |
+| city    | Company or person's city           | String         | No       |
 | country | Company or person's country        | String         | No       |
 
 ---
@@ -142,7 +141,6 @@ Invoice is considered "Cash" invoice when it is not paid by direct transaction t
 | fiscalize   | Determine if invoice is fiscalized                                                   | 0/1            | No  |
 | op-tax-id   | Personal tax ID of the person/company issuing an invoice                             | String         | Yes |
 | op-name     | Operators name that is printed on invoice                                            | String         | Yes |
-| test_mode   | Fiscalizes to **TEST** server. Location must be registered at TEST Tax office server | 0/1            | Yes |
 
 ---
 
@@ -212,7 +210,6 @@ $beezAPI->insertCustomer([
     'id_location' => 12,
     'fiscalize'   => 1,
     'op-tax-id    => '123456789',
-    'op-name'     => 'Operator',
-    'test_mode'   => 1
+    'op-name'     => 'Operator'
 ])->generatePDF('path/to/pdf/', 'PDF Title');
 ```
