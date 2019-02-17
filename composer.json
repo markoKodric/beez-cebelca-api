@@ -1,6 +1,6 @@
 {
     "name": "mare06xa/beez",
-    "description": ":description",
+    "description": "Package for creating invoices with Cebelca BIZ in Laravel.",
     "license": "license",
     "authors": [
         {
