@@ -6,16 +6,21 @@ class API
 {
     protected $apiToken;
     protected $apiDomain;
-    protected $debugMode;
+    protected $testMode;
 
     public function __construct()
     {
         $this->apiToken  = env("BIZ_TOKEN");
         $this->apiDomain = env("BIZ_DOMAIN");
-        $this->debugMode = env("BIZ_DEBUG");
+        $this->testMode  = env("BIZ_TEST_MODE");
     }
 
-    public function post($resource = "", $method = "", $data = "", $format = null, $explore = false)
+    public function testMode()
+    {
+        return $this->testMode;
+    }
+
+    public function post($resource = "", $method = "", $data = "")
     {
         $apiClient = new Client();
 
