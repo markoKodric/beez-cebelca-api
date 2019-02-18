@@ -6,7 +6,7 @@ Beez allows you to create invoices and generate invoices PDF files.
 Require this package with [composer](http://getcomposer.org).
 
 ```
-composer require mare06xa/beez --dev
+composer require mare06xa/beez
 ```
 
 Laravel 5.5+ uses **Package Auto-Discovery**, so doesn't require you to manually add the ServiceProvider.
